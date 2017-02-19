@@ -39,11 +39,13 @@ function draw() {
   }
 
   current.visited = true;
+  current.highlight();
   var nextCell = current.checkNeighbours();
 
   if (nextCell) {
     // now this cell is visited
     nextCell.visited = true;
+    removeWalls(current, nextCell);
     current = nextCell;
   }
 }
@@ -78,7 +80,7 @@ Cell.prototype.index = function(i, j) {
  * current selected cells are visited or not
  */
 Cell.prototype.checkNeighbours = function() {
-  // we need a stack to maintain the visited cells
+  // we need a list to select random cells
   var neighbours = [];
 
   // if the index pos is -1 then we will get undefined
@@ -103,7 +105,7 @@ Cell.prototype.checkNeighbours = function() {
     neighbours.push(left)
   }
 
-  // if neighbours (stack) has some value then
+  // if neighbours has some value then
   // select random cell
 
   if (neighbours.length > 0) {
@@ -141,7 +143,40 @@ Cell.prototype.show = function() {
     line(x, y + cellWidth, x, y);
 
   if (this.visited) {
+    noStroke();
     fill(255, 0, 255, 100);
     rect(x, y, cellWidth, cellWidth);
+  }
+};
+
+
+Cell.prototype.highlight = function() {
+  var x = this.i * cellWidth;
+  var y = this.j * cellWidth;
+
+  noStroke();
+  fill(0, 0, 255, 100);
+  rect(x, y, cellWidth, cellWidth);
+};
+
+var removeWalls = function(a, b) {
+  var x = a.i - b.i;
+
+  if (x === 1) {
+    a.walls[3] = false;
+    b.walls[1] = false;
+  } else if (x === -1) {
+    a.walls[1] = false;
+    b.walls[3] = false;
+  }
+
+  var y = a.j - b.j;
+
+  if (y === 1) {
+    a.walls[0] = false;
+    b.walls[2] = false;
+  } else if (y === -1) {
+    a.walls[2] = false;
+    b.walls[0] = false;
   }
 };
