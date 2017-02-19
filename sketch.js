@@ -9,6 +9,10 @@ var cellWidth = 40;
 // list to store all the cell objects
 var grid = [];
 
+// to keep track the current cell that is
+// being visited
+var current;
+
 function setup() {
   createCanvas(WIDTH, HEIGHT);
 
@@ -21,6 +25,9 @@ function setup() {
       grid.push(cell);
     }
   }
+
+  // initial position of the current variable
+  current = grid[0];
 }
 
 function draw() {
@@ -30,19 +37,87 @@ function draw() {
   for (var i = 0; i < grid.length; i++) {
     grid[i].show();
   }
+
+  current.visited = true;
+  var nextCell = current.checkNeighbours();
+
+  if (nextCell) {
+    // now this cell is visited
+    nextCell.visited = true;
+    current = nextCell;
+  }
 }
 
 function Cell(i, j) {
   this.i = i;
   this.j = j;
+
+  this.visited = false;
+
+  // to handle sides of walls
+  this.walls = [true, true, true, true];
 }
+
+/**
+ * get the position in the grid
+ * @param i row pos
+ * @param j column pos
+ */
+Cell.prototype.index = function(i, j) {
+
+  // Check for boundary conditions
+  if (i < 0 || j < 0 || i > rows - 1 || j > cols - 1)
+    return -1;
+
+  return i + j * cols;
+};
+
+
+/**
+ * This function will check if the neighbours of
+ * current selected cells are visited or not
+ */
+Cell.prototype.checkNeighbours = function() {
+  // we need a stack to maintain the visited cells
+  var neighbours = [];
+
+  // if the index pos is -1 then we will get undefined
+  var top = grid[this.index(this.i, this.j - 1)];
+  var right = grid[this.index(this.i + 1, this.j)];
+  var bottom = grid[this.index(this.i, this.j + 1)];
+  var left = grid[this.index(this.i - 1, this.j)];
+
+  if (top && !top.visited) {
+    neighbours.push(top)
+  }
+
+  if (right && !right.visited) {
+    neighbours.push(right)
+  }
+
+  if (bottom && !bottom.visited) {
+    neighbours.push(bottom)
+  }
+
+  if (left && !left.visited) {
+    neighbours.push(left)
+  }
+
+  // if neighbours (stack) has some value then
+  // select random cell
+
+  if (neighbours.length > 0) {
+    var randomCell = floor(random(0, neighbours.length));
+    return neighbours[randomCell];
+  } else {
+    return undefined;
+  }
+
+};
 
 Cell.prototype.show = function() {
   var x = this.i * cellWidth;
   var y = this.j * cellWidth;
-
-  // to handle sides of walls
-  this.walls = [true, true, true, true];
 
   stroke(255);
 
@@ -64,4 +139,9 @@ Cell.prototype.show = function() {
 
   if (this.walls[3])
     line(x, y + cellWidth, x, y);
+
+  if (this.visited) {
+    fill(255, 0, 255, 100);
+    rect(x, y, cellWidth, cellWidth);
+  }
 };
