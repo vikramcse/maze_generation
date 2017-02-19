@@ -41,6 +41,9 @@ Cell.prototype.show = function() {
   var x = this.i * cellWidth;
   var y = this.j * cellWidth;
 
+  // to handle sides of walls
+  this.walls = [true, true, true, true];
+
   stroke(255);
 
   // we did this step instead of simply adding rect
@@ -50,8 +53,15 @@ Cell.prototype.show = function() {
   // noFill();
   // rect(x, y, cellWidth, cellWidth);
 
-  line(x, y, x + cellWidth, y);
-  line(x + cellWidth, y, x + cellWidth, y + cellWidth);
-  line(x + cellWidth, y + cellWidth, x, y + cellWidth);
-  line(x, y + cellWidth, x, y);
+  if (this.walls[0])
+    line(x, y, x + cellWidth, y);
+
+  if (this.walls[1])
+    line(x + cellWidth, y, x + cellWidth, y + cellWidth);
+
+  if (this.walls[2])
+    line(x + cellWidth, y + cellWidth, x, y + cellWidth);
+
+  if (this.walls[3])
+    line(x, y + cellWidth, x, y);
 };
