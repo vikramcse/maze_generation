@@ -9,18 +9,21 @@ var cellWidth = 40;
 // list to store all the cell objects
 var grid = [];
 
+var stack = [];
+
 // to keep track the current cell that is
 // being visited
 var current;
 
 function setup() {
   createCanvas(WIDTH, HEIGHT);
+  frameRate(5);
 
   cols = floor(WIDTH / cellWidth);
   rows = floor(HEIGHT / cellWidth);
 
-  for (var i = 0; i < rows; i++) {
-    for (var j = 0; j < cols; j++) {
+  for (var j = 0; j < cols; j++) {
+    for (var i = 0; i < rows; i++) {
       var cell = new Cell(i, j);
       grid.push(cell);
     }
@@ -40,13 +43,20 @@ function draw() {
 
   current.visited = true;
   current.highlight();
+
   var nextCell = current.checkNeighbours();
 
   if (nextCell) {
     // now this cell is visited
     nextCell.visited = true;
+
+    stack.push(current);
+
     removeWalls(current, nextCell);
+
     current = nextCell;
+  } else if (stack.length > 0) {
+    current = stack.pop();
   }
 }
 
@@ -65,7 +75,7 @@ function Cell(i, j) {
  * @param i row pos
  * @param j column pos
  */
-Cell.prototype.index = function(i, j) {
+var index = function(i, j) {
 
   // Check for boundary conditions
   if (i < 0 || j < 0 || i > rows - 1 || j > cols - 1)
@@ -84,10 +94,10 @@ Cell.prototype.checkNeighbours = function() {
   var neighbours = [];
 
   // if the index pos is -1 then we will get undefined
-  var top = grid[this.index(this.i, this.j - 1)];
-  var right = grid[this.index(this.i + 1, this.j)];
-  var bottom = grid[this.index(this.i, this.j + 1)];
-  var left = grid[this.index(this.i - 1, this.j)];
+  var top = grid[index(this.i, this.j - 1)];
+  var right = grid[index(this.i + 1, this.j)];
+  var bottom = grid[index(this.i,  this.j + 1)];
+  var left = grid[index(this.i - 1, this.j)];
 
   if (top && !top.visited) {
     neighbours.push(top)
