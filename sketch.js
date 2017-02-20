@@ -17,7 +17,6 @@ var current;
 
 function setup() {
   createCanvas(WIDTH, HEIGHT);
-  frameRate(5);
 
   cols = floor(WIDTH / cellWidth);
   rows = floor(HEIGHT / cellWidth);
